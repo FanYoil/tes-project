@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  bot:
+    build: .
+    container_name: github-telegram-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - /tmp/telegram-shell:/tmp/telegram-shell
+    environment:
+      - PYTHONUNBUFFERED=1
