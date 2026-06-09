@@ -60,6 +60,41 @@ from handlers.git_handlers import (
     cmd_gitpull,
     cmd_gitclone,
 )
+from handlers.issues_handlers import (
+    cmd_issues,
+    cmd_createissue,
+    cmd_closeissue,
+    cmd_commentissue,
+    cmd_prs,
+    cmd_createpr,
+    cmd_mergepr,
+)
+from handlers.actions_handlers import (
+    cmd_workflows,
+    cmd_workflowruns,
+    cmd_runworkflow,
+    cmd_branches,
+    cmd_createbranch,
+    cmd_deletebranch,
+)
+from handlers.extra_handlers import (
+    cmd_releases,
+    cmd_createrelease,
+    cmd_gists,
+    cmd_creategist,
+    cmd_notifications,
+    cmd_markread,
+    cmd_star,
+    cmd_unstar,
+    cmd_starred,
+    cmd_follow,
+    cmd_unfollow,
+    cmd_sshkeys,
+    cmd_addsshkey,
+    cmd_deletesshkey,
+    cmd_contributors,
+    cmd_fork,
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -96,6 +131,26 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "• `/deletefile` — hapus file\n"
         "• `/visibility` — ubah visibility\n"
         "• `/renamerepo` — rename repo\n\n"
+        "🐛 *Issues & PRs:*\n"
+        "• `/issues` — lihat issues\n"
+        "• `/createissue <judul>` — buat issue\n"
+        "• `/prs` — lihat pull requests\n"
+        "• `/createpr` — buat PR\n"
+        "• `/mergepr <nomor>` — merge PR\n\n"
+        "⚙️ *Actions & Branches:*\n"
+        "• `/workflows` — daftar workflow\n"
+        "• `/workflowruns` — status run\n"
+        "• `/branches` — daftar branch\n"
+        "• `/createbranch <nama>` — buat branch\n\n"
+        "🎁 *Releases, Gists & Lainnya:*\n"
+        "• `/releases` — daftar release\n"
+        "• `/createrelease` — buat release\n"
+        "• `/gists` — lihat gist\n"
+        "• `/notifications` — notifikasi\n"
+        "• `/star` / `/unstar` — bintang repo\n"
+        "• `/fork <owner/repo>` — fork repo\n"
+        "• `/follow` / `/unfollow` — ikuti user\n"
+        "• `/sshkeys` — daftar SSH key\n\n"
     )
 
     if is_admin:
@@ -154,7 +209,42 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "`/clonerepo <url>` — Clone repo via terminal\n"
         "`/downloadrepo [owner/repo]` — Download ZIP\n"
         "`/visibility <private|public>` — Ubah visibility\n"
-        "`/renamerepo <nama_baru>` — Rename repo\n\n"
+        "`/renamerepo <nama_baru>` — Rename repo\n"
+        "`/fork <owner/repo>` — Fork repo\n"
+        "`/contributors` — Kontributor repo\n\n"
+        "━━━ 🐛 ISSUES ━━━\n"
+        "`/issues [closed]` — Daftar issues\n"
+        "`/createissue <judul> | <body>` — Buat issue\n"
+        "`/closeissue <nomor>` — Tutup issue\n"
+        "`/commentissue <nomor> <komentar>` — Komentar issue\n\n"
+        "━━━ 🔀 PULL REQUESTS ━━━\n"
+        "`/prs [closed]` — Daftar pull requests\n"
+        "`/createpr <head> <base> <judul>` — Buat PR\n"
+        "`/mergepr <nomor>` — Merge PR\n\n"
+        "━━━ ⚙️ ACTIONS & BRANCHES ━━━\n"
+        "`/workflows` — Daftar GitHub Actions workflow\n"
+        "`/workflowruns` — Status run terbaru\n"
+        "`/runworkflow <file.yml>` — Jalankan workflow\n"
+        "`/branches` — Daftar branch\n"
+        "`/createbranch <nama> [dari]` — Buat branch\n"
+        "`/deletebranch <nama>` — Hapus branch\n\n"
+        "━━━ 🏷️ RELEASES ━━━\n"
+        "`/releases` — Daftar release\n"
+        "`/createrelease <tag> <judul>` — Buat release\n\n"
+        "━━━ 📋 GISTS ━━━\n"
+        "`/gists` — Daftar gist\n"
+        "`/creategist <file> <konten>` — Buat gist\n\n"
+        "━━━ 🔔 LAINNYA ━━━\n"
+        "`/notifications` — Notifikasi GitHub\n"
+        "`/markread` — Tandai semua dibaca\n"
+        "`/star [owner/repo]` — Star repo\n"
+        "`/unstar [owner/repo]` — Hapus star\n"
+        "`/starred [username]` — Repo yang di-star\n"
+        "`/follow <username>` — Follow user\n"
+        "`/unfollow <username>` — Unfollow user\n"
+        "`/sshkeys` — Daftar SSH key\n"
+        "`/addsshkey <judul> <key>` — Tambah SSH key\n"
+        "`/deletesshkey <id>` — Hapus SSH key\n\n"
     )
 
     if is_admin:
@@ -243,6 +333,35 @@ async def post_init(app: Application):
         BotCommand("gitinit", "Init & push project baru ke GitHub"),
         BotCommand("gitstatus", "Git status direktori aktif"),
         BotCommand("gitlog", "Riwayat commit git"),
+        BotCommand("issues", "Daftar issues"),
+        BotCommand("createissue", "Buat issue baru"),
+        BotCommand("closeissue", "Tutup issue"),
+        BotCommand("commentissue", "Komentar di issue"),
+        BotCommand("prs", "Daftar pull requests"),
+        BotCommand("createpr", "Buat pull request"),
+        BotCommand("mergepr", "Merge pull request"),
+        BotCommand("workflows", "Daftar GitHub Actions"),
+        BotCommand("workflowruns", "Status workflow run"),
+        BotCommand("runworkflow", "Jalankan workflow"),
+        BotCommand("branches", "Daftar branch"),
+        BotCommand("createbranch", "Buat branch baru"),
+        BotCommand("deletebranch", "Hapus branch"),
+        BotCommand("releases", "Daftar release"),
+        BotCommand("createrelease", "Buat release baru"),
+        BotCommand("gists", "Daftar gist"),
+        BotCommand("creategist", "Buat gist baru"),
+        BotCommand("notifications", "Notifikasi GitHub"),
+        BotCommand("markread", "Tandai notifikasi dibaca"),
+        BotCommand("star", "Star repository"),
+        BotCommand("unstar", "Hapus star repository"),
+        BotCommand("starred", "Repo yang di-star"),
+        BotCommand("fork", "Fork repository"),
+        BotCommand("contributors", "Kontributor repo"),
+        BotCommand("follow", "Follow user GitHub"),
+        BotCommand("unfollow", "Unfollow user GitHub"),
+        BotCommand("sshkeys", "Daftar SSH key"),
+        BotCommand("addsshkey", "Tambah SSH key"),
+        BotCommand("deletesshkey", "Hapus SSH key"),
         BotCommand("shell", "Jalankan perintah terminal"),
         BotCommand("cd", "Pindah direktori terminal"),
         BotCommand("cwd", "Lihat direktori terminal saat ini"),
@@ -300,6 +419,38 @@ def main():
     app.add_handler(CommandHandler("gitinit", cmd_gitinit))
     app.add_handler(CommandHandler("gitstatus", cmd_gitstatus))
     app.add_handler(CommandHandler("gitlog", cmd_gitlog))
+
+    app.add_handler(CommandHandler("issues", cmd_issues))
+    app.add_handler(CommandHandler("createissue", cmd_createissue))
+    app.add_handler(CommandHandler("closeissue", cmd_closeissue))
+    app.add_handler(CommandHandler("commentissue", cmd_commentissue))
+    app.add_handler(CommandHandler("prs", cmd_prs))
+    app.add_handler(CommandHandler("createpr", cmd_createpr))
+    app.add_handler(CommandHandler("mergepr", cmd_mergepr))
+
+    app.add_handler(CommandHandler("workflows", cmd_workflows))
+    app.add_handler(CommandHandler("workflowruns", cmd_workflowruns))
+    app.add_handler(CommandHandler("runworkflow", cmd_runworkflow))
+    app.add_handler(CommandHandler("branches", cmd_branches))
+    app.add_handler(CommandHandler("createbranch", cmd_createbranch))
+    app.add_handler(CommandHandler("deletebranch", cmd_deletebranch))
+
+    app.add_handler(CommandHandler("releases", cmd_releases))
+    app.add_handler(CommandHandler("createrelease", cmd_createrelease))
+    app.add_handler(CommandHandler("gists", cmd_gists))
+    app.add_handler(CommandHandler("creategist", cmd_creategist))
+    app.add_handler(CommandHandler("notifications", cmd_notifications))
+    app.add_handler(CommandHandler("markread", cmd_markread))
+    app.add_handler(CommandHandler("star", cmd_star))
+    app.add_handler(CommandHandler("unstar", cmd_unstar))
+    app.add_handler(CommandHandler("starred", cmd_starred))
+    app.add_handler(CommandHandler("fork", cmd_fork))
+    app.add_handler(CommandHandler("contributors", cmd_contributors))
+    app.add_handler(CommandHandler("follow", cmd_follow))
+    app.add_handler(CommandHandler("unfollow", cmd_unfollow))
+    app.add_handler(CommandHandler("sshkeys", cmd_sshkeys))
+    app.add_handler(CommandHandler("addsshkey", cmd_addsshkey))
+    app.add_handler(CommandHandler("deletesshkey", cmd_deletesshkey))
 
     app.add_handler(CommandHandler("shell", cmd_shell))
     app.add_handler(CommandHandler("sh", cmd_shell))
