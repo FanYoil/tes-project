@@ -241,9 +241,12 @@ async def cmd_gitpush(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     else:
         log_lines.append(f"✅ git push:\n{truncate(out, 300)}")
 
-    # Ambil info repo dari remote
+    # Ambil info repo dari remote (hapus token dari URL sebelum ditampilkan)
     _, remote_info = await _git_run(cwd, ["remote", "get-url", "origin"])
-    repo_display = remote_info.strip().split("github.com/")[-1].replace(".git", "") if "github.com" in (remote_info or "") else cwd
+    safe_remote = remote_info.strip()
+    if "@" in safe_remote:
+        safe_remote = "https://github.com/" + safe_remote.split("github.com/")[-1]
+    repo_display = safe_remote.split("github.com/")[-1].replace(".git", "") if "github.com" in safe_remote else cwd
 
     result = (
         f"{'✅' if rc == 0 else '❌'} *Git Push*\n"

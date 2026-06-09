@@ -94,13 +94,18 @@ async def cmd_listrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     try:
         g = get_gh(update.effective_user.id)
         u = g.get_user()
-        repos = list(u.get_repos(sort="updated"))
+        repos_paged = u.get_repos(sort="updated")
+        repos = []
+        for r in repos_paged:
+            repos.append(r)
+            if len(repos) >= 30:
+                break
         if not repos:
             await update.message.reply_text("📭 Tidak ada repository.")
             return
 
         lines = []
-        for i, r in enumerate(repos[:30], 1):
+        for i, r in enumerate(repos, 1):
             visibility = "🔒" if r.private else "🌐"
             lang = r.language or "—"
             lines.append(
@@ -109,8 +114,8 @@ async def cmd_listrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
         total = u.public_repos + (u.owned_private_repos or 0)
         text = f"📁 *Repository milik {u.login}* (total: {total})\n\n" + "\n".join(lines)
-        if len(repos) > 30:
-            text += f"\n\n_...dan {len(repos)-30} repo lainnya_"
+        if total > 30:
+            text += f"\n\n_...tampilkan 30 terbaru dari {total} repo_"
         await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
     except ValueError as e:
         await update.message.reply_text(str(e))
@@ -306,15 +311,23 @@ async def cmd_downloadrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
         msg = await update.message.reply_text(f"⬇️ Mengunduh `{repo_name}`...", parse_mode=ParseMode.MARKDOWN)
 
+        MAX_SIZE = 50 * 1024 * 1024
         headers = {"Authorization": f"token {token}"} if token else {}
         async with aiohttp.ClientSession() as session:
             async with session.get(zip_url, headers=headers, allow_redirects=True) as resp:
                 if resp.status != 200:
                     await msg.edit_text(f"❌ Gagal download: HTTP {resp.status}")
                     return
+                content_length = resp.content_length
+                if content_length and content_length > MAX_SIZE:
+                    await msg.edit_text(
+                        f"⚠️ File terlalu besar ({size_human(content_length)}) untuk dikirim via Telegram.\n"
+                        f"🔗 Download langsung: {zip_url}"
+                    )
+                    return
                 data = await resp.read()
 
-        if len(data) > 50 * 1024 * 1024:
+        if len(data) > MAX_SIZE:
             await msg.edit_text(
                 f"⚠️ File terlalu besar ({size_human(len(data))}) untuk dikirim via Telegram.\n"
                 f"🔗 Download langsung: {zip_url}"
