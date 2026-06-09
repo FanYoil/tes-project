@@ -52,6 +52,14 @@ from handlers.ai_handlers import (
     cmd_explain,
     cmd_generate,
 )
+from handlers.git_handlers import (
+    cmd_gitstatus,
+    cmd_gitlog,
+    cmd_gitinit,
+    cmd_gitpush,
+    cmd_gitpull,
+    cmd_gitclone,
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -97,6 +105,13 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "• `/cd <path>` — pindah direktori\n"
             "• `/cwd` — direktori saat ini\n"
             "• `/env` — kelola env variables\n\n"
+            "⬆️ *Git Push/Pull (Admin Only):*\n"
+            "• `/gitpush [pesan]` — push project ke GitHub\n"
+            "• `/gitpull` — pull dari remote\n"
+            "• `/gitclone <url|owner/repo>` — clone repo\n"
+            "• `/gitinit <owner/repo>` — init & push project baru\n"
+            "• `/gitstatus` — lihat status git\n"
+            "• `/gitlog` — riwayat commit\n\n"
         )
 
     text += (
@@ -152,6 +167,14 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "`/env get KEY` — Lihat env var\n"
             "`/env list` — Daftar env var custom\n"
             "_Kirim file dgn caption perintah untuk upload & run_\n\n"
+            "━━━ ⬆️ GIT PUSH/PULL ━━━\n"
+            "`/gitpush [pesan commit]` — Push project ke GitHub\n"
+            "`/gitpull` — Pull dari remote origin\n"
+            "`/gitclone <url|owner/repo>` — Clone dengan token otomatis\n"
+            "`/gitinit <owner/repo>` — Init & push project baru ke repo\n"
+            "`/gitstatus` — Git status di direktori aktif\n"
+            "`/gitlog [n]` — Lihat n commit terakhir\n\n"
+            "💡 _Token GitHub otomatis di-inject, tidak perlu setup credential!_\n\n"
         )
 
     text += (
@@ -214,6 +237,12 @@ async def post_init(app: Application):
         BotCommand("visibility", "Ubah visibility repo"),
         BotCommand("renamerepo", "Rename repository"),
         BotCommand("clonerepo", "Clone repository"),
+        BotCommand("gitpush", "Push project terminal ke GitHub"),
+        BotCommand("gitpull", "Pull dari remote GitHub"),
+        BotCommand("gitclone", "Clone repo dengan token otomatis"),
+        BotCommand("gitinit", "Init & push project baru ke GitHub"),
+        BotCommand("gitstatus", "Git status direktori aktif"),
+        BotCommand("gitlog", "Riwayat commit git"),
         BotCommand("shell", "Jalankan perintah terminal"),
         BotCommand("cd", "Pindah direktori terminal"),
         BotCommand("cwd", "Lihat direktori terminal saat ini"),
@@ -264,6 +293,13 @@ def main():
     app.add_handler(CommandHandler("visibility", cmd_changevisibility))
     app.add_handler(CommandHandler("renamerepo", cmd_renamerepo))
     app.add_handler(CommandHandler("repoinfo", cmd_repoinfo))
+
+    app.add_handler(CommandHandler("gitpush", cmd_gitpush))
+    app.add_handler(CommandHandler("gitpull", cmd_gitpull))
+    app.add_handler(CommandHandler("gitclone", cmd_gitclone))
+    app.add_handler(CommandHandler("gitinit", cmd_gitinit))
+    app.add_handler(CommandHandler("gitstatus", cmd_gitstatus))
+    app.add_handler(CommandHandler("gitlog", cmd_gitlog))
 
     app.add_handler(CommandHandler("shell", cmd_shell))
     app.add_handler(CommandHandler("sh", cmd_shell))
