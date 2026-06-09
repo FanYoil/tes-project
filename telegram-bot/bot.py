@@ -77,6 +77,19 @@ from handlers.actions_handlers import (
     cmd_createbranch,
     cmd_deletebranch,
 )
+from handlers.codespace_handlers import (
+    cmd_codespaces,
+    cmd_csinfo,
+    cmd_createcodespace,
+    cmd_csstart,
+    cmd_csstop,
+    cmd_csdelete,
+    cmd_csmachines,
+    cmd_cssecrets,
+    cmd_cssecretset,
+    cmd_csexport,
+    cmd_csrename,
+)
 from handlers.extra_handlers import (
     cmd_releases,
     cmd_createrelease,
@@ -151,6 +164,16 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "• `/fork <owner/repo>` — fork repo\n"
         "• `/follow` / `/unfollow` — ikuti user\n"
         "• `/sshkeys` — daftar SSH key\n\n"
+        "🖥️ *GitHub Codespace:*\n"
+        "• `/codespaces` — daftar semua codespace\n"
+        "• `/createcodespace` — buat codespace baru\n"
+        "• `/csstart <nama>` — jalankan codespace\n"
+        "• `/csstop <nama>` — hentikan codespace\n"
+        "• `/csdelete <nama>` — hapus codespace\n"
+        "• `/csinfo <nama>` — detail codespace\n"
+        "• `/csexport <nama>` — export ke branch\n"
+        "• `/csmachines` — tipe mesin tersedia\n"
+        "• `/cssecrets` — lihat secrets codespace\n\n"
     )
 
     if is_admin:
@@ -362,6 +385,16 @@ async def post_init(app: Application):
         BotCommand("sshkeys", "Daftar SSH key"),
         BotCommand("addsshkey", "Tambah SSH key"),
         BotCommand("deletesshkey", "Hapus SSH key"),
+        BotCommand("codespaces", "Daftar GitHub Codespace"),
+        BotCommand("createcodespace", "Buat codespace baru"),
+        BotCommand("csstart", "Jalankan codespace"),
+        BotCommand("csstop", "Hentikan codespace"),
+        BotCommand("csdelete", "Hapus codespace"),
+        BotCommand("csinfo", "Detail codespace"),
+        BotCommand("csexport", "Export codespace ke branch"),
+        BotCommand("csrename", "Rename codespace"),
+        BotCommand("csmachines", "Tipe mesin codespace"),
+        BotCommand("cssecrets", "Daftar secrets codespace"),
         BotCommand("shell", "Jalankan perintah terminal"),
         BotCommand("cd", "Pindah direktori terminal"),
         BotCommand("cwd", "Lihat direktori terminal saat ini"),
@@ -451,6 +484,18 @@ def main():
     app.add_handler(CommandHandler("sshkeys", cmd_sshkeys))
     app.add_handler(CommandHandler("addsshkey", cmd_addsshkey))
     app.add_handler(CommandHandler("deletesshkey", cmd_deletesshkey))
+
+    app.add_handler(CommandHandler("codespaces", cmd_codespaces))
+    app.add_handler(CommandHandler("createcodespace", cmd_createcodespace))
+    app.add_handler(CommandHandler("csstart", cmd_csstart))
+    app.add_handler(CommandHandler("csstop", cmd_csstop))
+    app.add_handler(CommandHandler("csdelete", cmd_csdelete))
+    app.add_handler(CommandHandler("csinfo", cmd_csinfo))
+    app.add_handler(CommandHandler("csexport", cmd_csexport))
+    app.add_handler(CommandHandler("csrename", cmd_csrename))
+    app.add_handler(CommandHandler("csmachines", cmd_csmachines))
+    app.add_handler(CommandHandler("cssecrets", cmd_cssecrets))
+    app.add_handler(CommandHandler("cssecretset", cmd_cssecretset))
 
     app.add_handler(CommandHandler("shell", cmd_shell))
     app.add_handler(CommandHandler("sh", cmd_shell))
