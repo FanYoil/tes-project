@@ -50,6 +50,8 @@ def get_linked_repo(user_id: int) -> str | None:
 
 
 def set_linked_repo(user_id: int, repo_full_name: str):
+    if not repo_full_name or "/" not in repo_full_name:
+        raise ValueError(f"Format repo tidak valid: '{repo_full_name}'. Gunakan format owner/repo (contoh: username/my-repo)")
     data = _load_data()
     if str(user_id) not in data:
         data[str(user_id)] = {}

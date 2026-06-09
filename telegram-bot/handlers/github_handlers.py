@@ -14,6 +14,17 @@ from utils.auth import get_github_token, set_linked_repo, get_linked_repo
 from utils.helpers import send_long_message, size_human, truncate, format_code
 
 
+def _gh_error(e: GithubException) -> str:
+    status = e.status
+    if status == 401:
+        return "❌ Token GitHub tidak valid atau sudah expired. Gunakan /settoken untuk memperbarui token."
+    if status == 403:
+        return "❌ Token tidak punya izin untuk aksi ini. Pastikan scope token mencakup: repo, user, delete_repo."
+    if status == 404:
+        return "❌ Repo tidak ditemukan. Pastikan nama repo benar (format: owner/repo) dan token punya akses ke repo tersebut."
+    return f"❌ GitHub error {status}: {e.data.get('message', str(e)) if isinstance(e.data, dict) else str(e)}"
+
+
 def get_gh(user_id: int) -> Github:
     token = get_github_token(user_id)
     if not token:
@@ -86,6 +97,8 @@ async def cmd_profile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -119,6 +132,8 @@ async def cmd_listrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -152,6 +167,8 @@ async def cmd_searchrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -183,6 +200,8 @@ async def cmd_createrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -206,6 +225,8 @@ async def cmd_linkrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -252,6 +273,8 @@ async def cmd_browse(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -282,6 +305,8 @@ async def cmd_commits(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -344,6 +369,8 @@ async def cmd_downloadrepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -410,6 +437,8 @@ async def cmd_uploadfile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -444,6 +473,8 @@ async def cmd_editfile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -472,6 +503,8 @@ async def cmd_deletefile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -499,6 +532,8 @@ async def cmd_changevisibility(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -524,6 +559,8 @@ async def cmd_renamerepo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
@@ -560,6 +597,8 @@ async def cmd_repoinfo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
     except ValueError as e:
         await update.message.reply_text(str(e))
+    except GithubException as e:
+        await update.message.reply_text(_gh_error(e))
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
 
